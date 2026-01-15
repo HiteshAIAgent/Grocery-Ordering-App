@@ -45,9 +45,9 @@ if (!USE_PROXY) {
       console.log('🔑 Request headers being sent:', {
         'Authorization': `Bearer ${LUA_API_KEY.substring(0, 8)}...`,
         'X-API-Key': `${LUA_API_KEY.substring(0, 8)}...`,
-        'URL': config.url,
-        'BaseURL': config.baseURL,
-        'Full URL': config.baseURL + config.url
+        'URL': config.url || 'undefined',
+        'BaseURL': config.baseURL || 'undefined',
+        'Full URL': (config.baseURL || '') + (config.url || '')
       });
       
       return config;
@@ -97,6 +97,8 @@ export async function sendChatMessage(
 
   try {
     console.log(`Calling endpoint: ${endpoint}`);
+    console.log(`Base URL: ${LUA_API_URL}`);
+    console.log(`Full URL will be: ${LUA_API_URL}${endpoint}`);
     
     // Use the correct request body format (from Lua CLI ChatRequest interface)
     const requestBody: any = {
@@ -109,7 +111,21 @@ export async function sendChatMessage(
       sessionId: sessionId,
     };
     
-    const response = await apiClient.post<any>(endpoint, requestBody);
+    // Ensure headers are set directly on the request (fallback if interceptor doesn't work)
+    const requestConfig: any = {};
+    if (!USE_PROXY && LUA_API_KEY) {
+      requestConfig.headers = {
+        'Authorization': `Bearer ${LUA_API_KEY}`,
+        'X-API-Key': LUA_API_KEY,
+        'x-lua-api-key': LUA_API_KEY,
+      };
+      console.log('🔑 Setting headers directly on request:', {
+        'Authorization': `Bearer ${LUA_API_KEY.substring(0, 8)}...`,
+        'X-API-Key': `${LUA_API_KEY.substring(0, 8)}...`,
+      });
+    }
+    
+    const response = await apiClient.post<any>(endpoint, requestBody, requestConfig);
 
     console.log('✓ Success (201):', endpoint);
     console.log('Full response:', JSON.stringify(response, null, 2));
@@ -166,10 +182,43 @@ export async function sendChatMessage(
   } catch (error: any) {
     console.log(`✗ Failed ${endpoint}:`, error.response?.status || error.message);
     
+    // Log full error response for debugging
+    if (error.response) {
+      console.error('❌ Full error response:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+      
+      // Log what was sent
+      console.error('📤 Request that failed:', {
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        method: error.config?.method,
+        headers: error.config?.headers ? {
+          'Authorization': error.config.headers['Authorization'] ? 
+            `${error.config.headers['Authorization'].substring(0, 20)}...` : 'NOT SET',
+          'X-API-Key': error.config.headers['X-API-Key'] ? 
+            `${error.config.headers['X-API-Key'].substring(0, 8)}...` : 'NOT SET'
+        } : 'NO HEADERS'
+      });
+    }
+    
     if (error.response?.status === 401) {
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Authentication failed';
+      console.error('❌ 401 Unauthorized Details:', errorMessage);
+      console.error('💡 Possible causes:');
+      console.error('   1. API key is invalid or expired');
+      console.error('   2. API key does not have access to this agent');
+      console.error('   3. API key format is incorrect');
+      console.error(`   4. API key in use: ${LUA_API_KEY.substring(0, 8)}...`);
+      console.error(`   5. Agent ID: ${AGENT_ID}`);
+      
       throw new Error(
-        `Authentication failed (401). Please verify your API key is correct and valid. ` +
-        `Check your .env file and restart the dev server.`
+        `Authentication failed (401): ${errorMessage}. ` +
+        `Please verify your API key is correct, not expired, and has access to agent ${AGENT_ID}. ` +
+        `Check your Vercel environment variables and try generating a new API key if needed.`
       );
     }
     
