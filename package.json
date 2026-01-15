@@ -9,7 +9,7 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "build": "cd frontend && npm install && npm run build",
+    "build": "cd frontend && npm ci && npm run build && echo 'Build completed in frontend/dist' && ls -la dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
