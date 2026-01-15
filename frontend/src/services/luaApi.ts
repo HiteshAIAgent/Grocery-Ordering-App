@@ -31,14 +31,34 @@ const apiClient = axios.create({
 });
 
 // Add request interceptor to include API key (only if not using proxy)
-if (!USE_PROXY && LUA_API_KEY) {
-  apiClient.interceptors.request.use((config) => {
-    // Try multiple authentication formats
-    config.headers['Authorization'] = `Bearer ${LUA_API_KEY}`;
-    config.headers['X-API-Key'] = LUA_API_KEY;
-    config.headers['x-lua-api-key'] = LUA_API_KEY;
-    return config;
-  });
+// Always add interceptor in production to ensure headers are set
+if (!USE_PROXY) {
+  if (LUA_API_KEY) {
+    console.log('🔧 Setting up request interceptor (production mode, API key available)');
+    apiClient.interceptors.request.use((config) => {
+      // Try multiple authentication formats
+      config.headers['Authorization'] = `Bearer ${LUA_API_KEY}`;
+      config.headers['X-API-Key'] = LUA_API_KEY;
+      config.headers['x-lua-api-key'] = LUA_API_KEY;
+      
+      // Debug: Log what headers are being sent (without exposing full key)
+      console.log('🔑 Request headers being sent:', {
+        'Authorization': `Bearer ${LUA_API_KEY.substring(0, 8)}...`,
+        'X-API-Key': `${LUA_API_KEY.substring(0, 8)}...`,
+        'URL': config.url,
+        'BaseURL': config.baseURL,
+        'Full URL': config.baseURL + config.url
+      });
+      
+      return config;
+    });
+    console.log('✅ Request interceptor registered successfully');
+  } else {
+    console.error('❌ CRITICAL: No API key available in production!');
+    console.error('USE_PROXY:', USE_PROXY);
+    console.error('LUA_API_KEY exists:', !!LUA_API_KEY);
+    console.error('Environment variables available:', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
+  }
 }
 
 export interface ChatMessage {
