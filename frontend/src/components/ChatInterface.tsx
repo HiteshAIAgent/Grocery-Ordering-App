@@ -71,8 +71,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         setSessionId(response.sessionId);
       }
 
+      // Debug: Log full response to see structure
+      console.log('📦 Full API Response:', JSON.stringify(response, null, 2));
+      console.log('📦 Response.data:', response.data);
+      console.log('📦 Response.data?.steps:', response.data?.steps);
+      
       // Check for store comparisons early and clean message
       const hasStoreComparisons = response.data?.steps?.[0]?.toolResults?.[0]?.payload?.result?.comparisons;
+      console.log('🔍 Has store comparisons (early check):', hasStoreComparisons);
       
       let cleanedMessage = response.message || 'I understand. Let me help you with that.';
       
@@ -259,7 +265,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           if (onStoreComparisonsUpdate) {
             onStoreComparisonsUpdate(comparisons);
           }
+          // Replace message with clean one when comparisons are found
+          cleanedMessage = "I've found the best prices for you. Please select a store from the options above 👆";
+          // Update the last message with cleaned version
+          setMessages((prev) => {
+            const updated = [...prev];
+            if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
+              updated[updated.length - 1] = { ...updated[updated.length - 1], content: cleanedMessage };
+            }
+            return updated;
+          });
         } else {
+          console.log('⚠️ No comparisons found in tool results. Attempting text parsing...');
           // Fallback: try to parse store comparisons from the message text
           const textComparisons = parseComparisonsFromText(response.message || '', messages);
           if (textComparisons.length > 0) {
@@ -268,6 +285,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             if (onStoreComparisonsUpdate) {
               onStoreComparisonsUpdate(textComparisons);
             }
+            // Replace message with clean one
+            cleanedMessage = "I've found the best prices for you. Please select a store from the options above 👆";
+            setMessages((prev) => {
+              const updated = [...prev];
+              if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
+                updated[updated.length - 1] = { ...updated[updated.length - 1], content: cleanedMessage };
+              }
+              return updated;
+            });
+          } else {
+            console.error('❌ No comparisons found in any format. Full toolData:', toolData);
           }
         }
       } else {
