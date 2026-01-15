@@ -10,6 +10,7 @@ frontend/node_modules/
 
 # Build outputs
 dist/
+!dist/.gitkeep
 frontend/dist/
 build/
 
