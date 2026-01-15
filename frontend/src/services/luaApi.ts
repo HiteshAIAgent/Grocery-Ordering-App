@@ -9,10 +9,18 @@ const LUA_API_KEY = import.meta.env.VITE_LUA_API_KEY || '';
 const AGENT_ID = import.meta.env.VITE_LUA_AGENT_ID || 'baseAgent_agent_1768481902814_l243cp0lt';
 
 // Debug: Log API key status (without exposing the actual key)
+console.log('🔍 Environment Check:', {
+  USE_PROXY,
+  hasApiKey: !!LUA_API_KEY,
+  apiKeyPreview: LUA_API_KEY ? LUA_API_KEY.substring(0, 8) + '...' : 'NOT FOUND',
+  apiUrl: LUA_API_URL,
+  agentId: AGENT_ID
+});
 if (!LUA_API_KEY) {
-  console.warn('⚠️ LUA_API_KEY is not set in environment variables');
+  console.error('❌ LUA_API_KEY is not set in environment variables');
+  console.error('Available env vars:', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
 } else {
-  console.log('✓ API Key loaded:', LUA_API_KEY.substring(0, 8) + '...');
+  console.log('✅ API Key loaded:', LUA_API_KEY.substring(0, 8) + '...');
 }
 
 const apiClient = axios.create({
