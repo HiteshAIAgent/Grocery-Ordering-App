@@ -1,0 +1,9 @@
+# Alternative: Netlify configuration (if you want to try Netlify instead)
+[build]
+  command = "cd frontend && npm install && npm run build"
+  publish = "frontend/dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
