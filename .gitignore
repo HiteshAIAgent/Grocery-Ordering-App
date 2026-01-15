@@ -25,3 +25,5 @@ Thumbs.db
 
 # Git
 .git/
+.vercel
+.env*.local
