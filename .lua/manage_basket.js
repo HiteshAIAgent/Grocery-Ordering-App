@@ -1,0 +1,8 @@
+async (input) => {
+  var u=Object.defineProperty;var g=Object.getOwnPropertyDescriptor;var p=Object.getOwnPropertyNames;var f=Object.prototype.hasOwnProperty;var w=(r,e)=>{for(var t in e)u(r,t,{get:e[t],enumerable:!0})},b=(r,e,t,s)=>{if(e&&typeof e=="object"||typeof e=="function")for(let o of p(e))!f.call(r,o)&&o!==t&&u(r,o,{get:()=>e[o],enumerable:!(s=g(e,o))||s.enumerable});return r};var C=r=>b(u({},"__esModule",{value:!0}),r);var v={};w(v,{default:()=>m});module.exports=C(v);var a=require("zod"),m=class{name="manage_basket";description="Add items to or remove items from the grocery basket. Returns updated basket with item count and total.";inputSchema=a.z.object({currentItems:a.z.array(a.z.string()).describe("Current list of items in the basket"),action:a.z.enum(["add","remove"]).describe("Whether to add or remove items"),items:a.z.array(a.z.string()).describe("Items to add or remove from the basket")});async execute(e){let{currentItems:t,action:s,items:o}=e,n;if(s==="add"){let d=t.map(c=>c.toLowerCase()),i=o.filter(c=>!d.includes(c.toLowerCase()));n=[...t,...i]}else{let d=o.map(i=>i.toLowerCase());n=t.filter(i=>!d.includes(i.toLowerCase()))}let h=s==="add"?o.length:0,l=s==="remove"?t.length-n.length:0;return{items:n,itemCount:n.length,action:s,itemsChanged:s==="add"?h:l,message:s==="add"?`Added ${h} item(s). Basket now has ${n.length} item(s).`:`Removed ${l} item(s). Basket now has ${n.length} item(s).`}}};
+
+  
+  const ToolClass = module.exports.default || module.exports.ManageBasketTool || module.exports;
+  const toolInstance = new ToolClass();
+  return await toolInstance.execute(input);
+}

@@ -1,0 +1,8 @@
+async (input) => {
+  var n=Object.defineProperty;var c=Object.getOwnPropertyDescriptor;var l=Object.getOwnPropertyNames;var u=Object.prototype.hasOwnProperty;var m=(r,e)=>{for(var t in e)n(r,t,{get:e[t],enumerable:!0})},h=(r,e,t,i)=>{if(e&&typeof e=="object"||typeof e=="function")for(let o of l(e))!u.call(r,o)&&o!==t&&n(r,o,{get:()=>e[o],enumerable:!(i=c(e,o))||i.enumerable});return r};var f=r=>h(n({},"__esModule",{value:!0}),r);var y={};m(y,{default:()=>d});module.exports=f(y);var s=require("zod"),d=class{name="process_checkout";description="Process the checkout by collecting delivery address and confirming the order. Use this when the user confirms they're ready to checkout.";inputSchema=s.z.object({store:s.z.string().describe("The selected store name"),items:s.z.array(s.z.string()).describe("List of items in the basket"),total:s.z.number().describe("Total cost of the order"),address:s.z.string().optional().describe("Delivery address (if provided by user)")});async execute(e){let{store:t,items:i,total:o,address:a}=e;return a?{status:"confirmed",orderNumber:`ORD-${Date.now().toString().slice(-8)}`,store:t,items:i,itemCount:i.length,total:o.toFixed(2),address:a,message:`Thank you for your order! Your order #${Date.now().toString().slice(-8)} has been confirmed. Your groceries will be delivered to ${a} from ${t}.`}:{status:"address_required",message:"Please provide your delivery address to complete your order.",orderDetails:{store:t,itemCount:i.length,total:o.toFixed(2)}}}};
+
+  
+  const ToolClass = module.exports.default || module.exports.ProcessCheckoutTool || module.exports;
+  const toolInstance = new ToolClass();
+  return await toolInstance.execute(input);
+}

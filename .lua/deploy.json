@@ -1,0 +1,166 @@
+{
+  "skills": [
+    {
+      "name": "grocery-ordering-skill",
+      "description": "Tools for grocery ordering from UK stores (Sainsbury's, Tesco, ASDA, Waitrose). Handles item parsing, price comparison, basket management, and checkout.",
+      "context": "Use these tools when users want to order groceries. The flow should be:\n    1. Parse items from user input (items can be separated by commas, spaces, or periods)\n    2. Show prices from available stores (Sainsbury's, Tesco, ASDA, Waitrose)\n    3. Allow user to compare stores and choose cheapest or fastest delivery\n    4. Allow user to add or remove items from basket at any time\n    5. When user says \"ok\" or confirms, ask for delivery address\n    6. Process checkout and show thank you message\n    \n    Be conversational and helpful. Always show item prices clearly. Let users modify their basket before final checkout.",
+      "tools": [
+        {
+          "name": "parse_grocery_items",
+          "description": "Parse a list of grocery items from user input. Items can be separated by commas, spaces, or periods.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "userInput": {
+                "type": "string",
+                "description": "The user's input containing grocery items separated by commas, spaces, or periods"
+              }
+            },
+            "required": [
+              "userInput"
+            ],
+            "additionalProperties": false
+          },
+          "execute": "H4sIAAAAAAAAE41UTW/bMAy991eoxpBJmKD2HEO5dBjQw9YC660bUkVmEhWy5Ely29Txfx8lJ+vHdhhgwAb5yPfER1nFndOEGtf1iRG5IMMJIQ8qEC+vVvegk2hgbRxcB99BSLs659Qxt4F09eiOuc8QdTBd8qGgun+jvqkWYgHoI6ALPvm060BsVXwFLahe0sSBycWw9oHmiCHGEWAe44YP2H0Ot+YnB9e3ENTKwvz0fGQj35RKxIRcbdYUZrPM4tcEpKx8Ia/2+1exde90Mt5VLJNZSCQSTHUUGDvVQitrsWdks1k8ldLMZllEnERQZIHb+FYIDVJRwAq23wfxkhlZHSD1wZE0lmNameRiQz0dRl4tlxC/+qa3UPHhQdl+OhJPrGAbOYx1Txs+oDmqtxO3w55tKRLw1PmQorS0mSpaGeBXbwLQ6tk3FeNOaqtiHBy6IatOhQjLTfAawm5pErSxqpuDnTgOWV1nBFHEmpjyRA5YUrBkHXxL+gjoTV4kQS5LWCtHVkAiYH+VoCGrHdG+bVXkJHZKA749LgoE45soqrpUf9dbaJVsxbOYLKJDbn2Zc/McjSkYt6FMTApXeKibLRT+j3FSgDQuKeMQ907qf4qpGE5TlcsBT6D7BLgCAy7EKy1mlMCDNCJ21iR6dsvFj/jz0xkTrepolIsoUGlLGRNrYxOEKWbBbdJ2cX7cgKEImwee3xe+d2keDiCOVyWqDczvvmC8IR+GY2Ysx6GRzUvw3htHK05Q9t04jvUJ3mJ8cApo14339iK7TSR5uyDisD9kv3+fKYYXG3P534D6T/uE+Uv8UE4DMjh4fGGkLOMOm64elXkLF8fZTv+f+mT8DdYr4xCQBAAA"
+        },
+        {
+          "name": "get_store_prices",
+          "description": "Get prices for grocery items from a specific UK store (Sainsburys, Tesco, ASDA, or Waitrose). Returns item prices, total cost, and delivery time.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "store": {
+                "type": "string",
+                "enum": [
+                  "sainsbury",
+                  "tesco",
+                  "asda",
+                  "waitrose"
+                ],
+                "description": "The store name (lowercase)"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of grocery items to get prices for"
+              }
+            },
+            "required": [
+              "store",
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "execute": "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"
+        },
+        {
+          "name": "compare_stores",
+          "description": "Compare prices and delivery times across all UK stores (Sainsburys, Tesco, ASDA, Waitrose) for given items. Returns comparison with cheapest and fastest options.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of grocery items to compare"
+              },
+              "preference": {
+                "type": "string",
+                "enum": [
+                  "cheapest",
+                  "fastest",
+                  "both"
+                ],
+                "description": "Whether to find cheapest, fastest, or both (default: both)"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "execute": "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"
+        },
+        {
+          "name": "manage_basket",
+          "description": "Add items to or remove items from the grocery basket. Returns updated basket with item count and total.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "currentItems": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Current list of items in the basket"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "add",
+                  "remove"
+                ],
+                "description": "Whether to add or remove items"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Items to add or remove from the basket"
+              }
+            },
+            "required": [
+              "currentItems",
+              "action",
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "execute": "H4sIAAAAAAAAE5VVTY/bNhC976/gCoFBAiqRswU6SN3LAklTpAV6WCx2aWlksaVIlaTsOLL+e4aUtLt2ckgBwzBm3rw3n7T0J1MSqkzXB0bEhgw3hBykI734tPsHysArqJWBP5ztwIVTEX37xbeH8OloFt9v4EunumBdQnU/Rv0uW/AJUC+Aztlgw6kD3kj/CppQR0FdDkxshto6Gi2BKEOA9WgP+YDsa7gPDzmYvgUndxrWt29HNua7FIkYH6NVTWG1iiq2JiBEZpN4dj6/stW9KYOyJmNRTEMglqCro8DYbc1LqTVyWrZa2VshwmoVk7BTEhRV4N5eJkK92FPACHY+e/7iGVnhIPTOEDemMrfCic2O9nQY8+zxEfxHW/Uasnw4SN1PJeWOJexBDGNxpId8wOHIXk/aLXK2KYjDl8664MWWHqYIKRz81ysHNPtqq4zlrSi19H4wOA2RtdLIPTzupP8XQlZU8yCxESJ7X1VEBWg9CdgLRxy09gCzqXa2JaEBsne2BHciEwUnn1NxnvRdJQNUs50cVWhSKCltbwKRpkLaIDXPirSDf5YNtFJI/pVP86FD2TsHJtxFwXV0SOfkicZfPjhl9pQxPqW8w/q2E5xo5UOc3ZQobkxMc66Q5TKNOdHFodD7TFZVlmdTddnDa8a/G8BYF+tH0HUPkEz9ZGp3SxsvaZ6buGSHg5TpLuELlH0A3L4Bd/GyE2Gpwc/6dhSQmwL33Atc5VhPCiOVCLyVHS3FpuTBfrBHcFvpAZPLlbC8VjqAi+7biitT6h5TptdQVhhxzzkPOX6phxG0h5neJnolNuoqBkPCQq8u6a+hbIxcjXjO/Z3lGsw+NOu3uZ7M83Dehdnzi3mGzNc0TK0wqSXbuGLrBXPVrm0jzR6q9Ytes9Y5Pk0eL+GV9Qn3H/f3zdCMad7UM05+nbbZ2CPBFwudi8gL5mn99DmlG2P1/4wdx7G4wYcYP6U1uMd/Wau38WCJIJc3zucngJzP156P6aonvUjwPaR4Fgjov8Mf0pSAGgaOL5qURdz8XMmjVJdwvmzp9CdS3IzfAEFyNJRVBgAA"
+        },
+        {
+          "name": "process_checkout",
+          "description": "Process the checkout by collecting delivery address and confirming the order. Use this when the user confirms theyre ready to checkout.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "store": {
+                "type": "string",
+                "description": "The selected store name"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of items in the basket"
+              },
+              "total": {
+                "type": "number",
+                "description": "Total cost of the order"
+              },
+              "address": {
+                "type": "string",
+                "description": "Delivery address (if provided by user)"
+              }
+            },
+            "required": [
+              "store",
+              "items",
+              "total"
+            ],
+            "additionalProperties": false
+          },
+          "execute": "H4sIAAAAAAAAE4VVUW/bNhB+z6+4qIVLAapQ7GmQwewhxoABWxOs2cNQFAktnWw2FOmSVBxV1n/fkZIcOx1Qw4Bk3se77777SAvX6RKY1LvWp8CvoL8AeBIWNL9Zf8XS5xXWUuOtNTu0vluGWDnHNuhv9nqOrdCVVu68sRGl/h/1UTToIqCdATtrvPHdDvOtcCfQiGo4sxmm/KqvjWVhxYPUgKmmdZ/1lL3Az/5Lhrpt0Iq1wuLyw5AO2TbuJIwMu2XNcLEIVUwNyHliYvHkcDhZq1tdeml0koZiCj0YoJBimKaXbV4KpSinSRcLc8m5XywCCTOSYFQFP5tzIkzykiHtSA8Hmb9EhnRp0bdWgx1imzW3/GrLNOuHLLm/R/eXqVqFSdY/CdWOLWU2jdiO98OyYV3W03BEq8baFeVs4qYcn3fGesdr1o07HLf4rZUWWfLdVEmaVbxUwrle0zR4QgMo0bn7covlo2l9sqymWZIWPLkdw+C3CDME1h2URimSUOoNVKjkE9oORFXZgBW6oriupW1CPGw1tkKbwz8O6ad0sN+ijoHWoZ3BsUr3ziJYFFUH3hxL5sky+vQTLTSCu/x7Ps6Q9Y5Mh0VYcd5SPZbmYwdr6viOSjgMTLGCiITQNqkgPTYubhPWio6dJjjN8Kd0Pvgg4oP7Auu1cI/oKQt5V6iYhca7RntePASpuTHBUQbaNil1ztpEyYU6y7F6LS6TNdDMnmRFHdEggoBpkpIBRDzP+Ixl65Fc25OHJ3X81K6cCJsjAzFwnO0ofiO48K0rkmkiWCVZ5Pwxdlc83Py9ev+2XwmPuTZ7YurNp5m/U7JE9v7XdHjIXpcNz2vTal/IXKHe+O3MhDL8Lp+xYr+8yCIyuiec2GDxcLcV+hE60wKdyvC0o4iX8O/xHd78nBLQ9QJrJNcdW8vHFJvgcCuRTCmVIsxsaNKXHPi2FwPU1jT05of8YSiOIk1076fzRVrNtJNbhYK8Pg1q5P3DOQn+Ns2OxoQnneWT5Cv0QipXnI3wpxoO9Fle0EVOX+qUrHdnjLoOBx44nN8R+XSFwOHwOjId++vp+IUcP6KWxxqe4n/Qi9AlUhmN+5eyLA242WJ7Ic/h+WzY8X9oeTH8B6b6DcyYBgAA"
+        }
+      ],
+      "skillId": "cc5c2c6e-8cf6-4707-80f0-1d860b974ca3",
+      "version": "1.0.1"
+    }
+  ]
+}

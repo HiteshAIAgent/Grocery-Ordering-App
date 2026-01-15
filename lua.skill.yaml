@@ -1,0 +1,12 @@
+agent:
+  agentId: baseAgent_agent_1768481902814_l243cp0lt
+  orgId: 85309d37-c02b-4789-851b-1b9d0d968ae1
+skills:
+  - name: grocery-ordering-skill
+    version: 1.0.2
+    skillId: cc5c2c6e-8cf6-4707-80f0-1d860b974ca3
+webhooks: []
+jobs: []
+preprocessors: []
+postprocessors: []
+mcpServers: []
